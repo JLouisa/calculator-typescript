@@ -2,3 +2,87 @@ h1 {
   color: blueviolet;
   text-align: center;
 }
+
+header {
+  border-bottom: 2px solid #777;
+}
+
+/* ================Main================= */
+
+main {
+  min-height: 70vh;
+}
+
+.mainLayout {
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: repeat(3, 1fr);
+  height: 100%;
+  padding: 2em;
+}
+
+.calculatorLayout {
+  border: 1px solid red;
+  grid-row: 1/2;
+  grid-column: 2/3;
+  height: 100%;
+  padding: 2em;
+}
+
+.wrapper {
+  border: 1px solid blue;
+  padding: 1em;
+}
+
+.screen {
+  border: 1px solid black;
+  padding: 1em;
+  margin-bottom: 0.5em;
+}
+
+.bigScreen {
+  border-bottom: 1px solid #777;
+  padding: 0.5em 0.5em 0.5em 0.5em;
+}
+
+.smallScreen {
+  padding: 0.2em 0.5em 0.2em 0.5em;
+}
+
+.smallScreen,
+.bigScreen {
+  text-align: end;
+}
+
+.buttonsLayout {
+  display: grid;
+  grid-template-rows: repeat(4, 1fr);
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1em;
+}
+
+.buttons {
+  border: 1px solid black;
+  border-radius: 10px;
+  padding: 1em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ===================Footer==================== */
+footer {
+  border-top: 2px solid #777;
+  padding: 1em;
+}
+
+.links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.links img {
+  width: 40px;
+  height: auto;
+}
