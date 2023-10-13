@@ -29,6 +29,18 @@ main {
   padding: 2em;
 }
 
+.historyLayout {
+  border: 1px solid green;
+  grid-row: 1/2;
+  grid-column: 3/4;
+  padding: 2em;
+}
+
+.history {
+  padding: 2em;
+  margin: 1em;
+}
+
 .wrapper {
   border: 1px solid blue;
   padding: 1em;

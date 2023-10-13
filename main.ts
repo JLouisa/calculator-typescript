@@ -44,25 +44,8 @@ const app = (() => {
 
     constructor(historyNum1: number, methods: string, historyNum2: number, result: number) {
       this.historyNum1 = historyNum1;
-      this.methods = ` ${methods} `;
-      this.historyNum2 = historyNum2;
-      this.result = result;
-    }
-  }
-
-  interface theHistory2 {
-    historyNum1: number;
-    methods: string;
-  }
-
-  class History2 implements theHistory2 {
-    historyNum1: number;
-    methods: string;
-    result: number;
-
-    constructor(historyNum1: number, methods: string, result: number) {
-      this.historyNum1 = historyNum1;
       this.methods = methods;
+      this.historyNum2 = historyNum2;
       this.result = result;
     }
   }
@@ -71,7 +54,7 @@ const app = (() => {
   let inputArr: (number | string)[] = [];
   let calcMethod: string = "";
   let calcArr: (number | string)[] = [];
-  let historyArr: object[] = [];
+  let historyArr: History[] = [];
   let smallScreenArr: (number | string)[] = [];
 
   //! Falsy and Truthy
@@ -81,6 +64,8 @@ const app = (() => {
   //! Caching DOM
   const buttonsEl: HTMLElement | null = document.querySelector(".buttonsLayout");
   const screenEl: HTMLElement | null = document.querySelector(".screen");
+  const historyLayoutEl: HTMLElement | null = document.querySelector(".historyLayout");
+  const historyWrapperEl: HTMLElement | null = document.querySelector(".historyWrapper");
 
   //! Create calculator layout
   // Screen layout
@@ -145,7 +130,7 @@ const app = (() => {
         }
         if (equalState === true) {
           inputArr = [];
-          //   smallScreenArr = [];
+          smallScreenArr = [];
           showSmallScreen(contentArr[i]);
           console.log(contentArr[i]);
           inputArr.push(contentArr[i]);
@@ -243,22 +228,22 @@ const app = (() => {
       }
     }
   }
-
   function executeCalc(num1: number, num2: number, theMethod: string, func: Function) {
     const result = func(num1, num2);
     historyArr.push(new History(num1, theMethod, num2, result));
     bigScreenEl!.textContent = result.toString();
     calcArr = [];
     inputArr = result.toString().split(",");
+    showHistory();
     console.log(historyArr);
   }
-
   function executeCalc2(num1: number, theMethod: string, func: Function) {
     const result = func(num1);
-    historyArr.push(new History2(num1, theMethod, result));
+    historyArr.push(new History(num1, theMethod, 1, result));
     bigScreenEl!.textContent = result.toString();
     calcArr = [];
     inputArr = result.toString().split(",");
+    showHistory();
     console.log(historyArr);
   }
 
@@ -273,5 +258,21 @@ const app = (() => {
       smallScreenEl!.textContent = "0";
     }
     smallScreenEl!.textContent = smallScreenArr.join("");
+  }
+
+  function showHistory() {
+    historyWrapperEl!.textContent = "";
+    let x = 1;
+    const num = historyArr.length - 5;
+    for (let i = historyArr.length; i >= num; i--) {
+      console.log("showHistory");
+      if (historyArr[i]) {
+        const mainSync = document.createElement("div");
+        mainSync.classList.add("history", `histNum${i}`);
+        mainSync.textContent = `${x++}.  ${historyArr[i].historyNum1} ${historyArr[i].methods} 
+        ${historyArr[i].historyNum2} = ${historyArr[i].result}`;
+        historyWrapperEl?.appendChild(mainSync);
+      }
+    }
   }
 })();
