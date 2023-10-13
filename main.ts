@@ -270,7 +270,7 @@ const app = (() => {
   function showSmallScreenDel() {
     smallScreenArr.pop();
     if (smallScreenArr.length === 0) {
-      smallScreenArr[0] = 0;
+      smallScreenEl!.textContent = "0";
     }
     smallScreenEl!.textContent = smallScreenArr.join("");
   }
