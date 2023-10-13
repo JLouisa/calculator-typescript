@@ -68,6 +68,15 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: 0.1s;
+}
+
+.buttons:hover {
+  background-color: aquamarine;
+}
+
+.buttons:active {
+  transform: scale(0.95);
 }
 
 /* ===================Footer==================== */
