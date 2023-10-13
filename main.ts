@@ -64,7 +64,7 @@ const app = (() => {
   //! Caching DOM
   const buttonsEl: HTMLElement | null = document.querySelector(".buttonsLayout");
   const screenEl: HTMLElement | null = document.querySelector(".screen");
-  const historyLayoutEl: HTMLElement | null = document.querySelector(".historyLayout");
+  //   const historyLayoutEl: HTMLElement | null = document.querySelector(".historyLayout");
   const historyWrapperEl: HTMLElement | null = document.querySelector(".historyWrapper");
 
   //! Create calculator layout
@@ -167,11 +167,14 @@ const app = (() => {
 
   // Equal
   arr[19].addEventListener("click", () => {
+    equalCalc();
+  });
+  function equalCalc() {
     equalState = true;
     calcArr.push(Number(inputArr.join("")));
     console.log(calcArr);
     calculation(calcArr[0] as number, calcMethod[0] as string, calcArr[2] as number);
-  });
+  }
   // Clear
   arr[0].addEventListener("click", () => {
     inputArr = [];
@@ -182,15 +185,7 @@ const app = (() => {
   });
   // Clear Everything
   arr[1].addEventListener("click", () => {
-    inputArr = [];
-    calcArr = [];
-    smallScreenArr = [];
-    calcMethod = "";
-    equalState = false;
-    numState = false;
-    bigScreenEl.textContent = "0";
-    smallScreenEl.textContent = "0";
-    console.log("Cleared Everything");
+    resetEverything();
   });
   // Delete
   arr[2].addEventListener("click", () => {
@@ -198,6 +193,18 @@ const app = (() => {
     showSmallScreenDel();
     console.log(inputArr);
   });
+
+  function resetEverything(): void {
+    inputArr = [];
+    calcArr = [];
+    smallScreenArr = [];
+    calcMethod = "";
+    equalState = false;
+    numState = false;
+    bigScreenEl!.textContent = "0";
+    smallScreenEl!.textContent = "0";
+    console.log("Cleared Everything");
+  }
 
   //! Calculation Controller Module
   function calculation(num1: number, theMethod: string, num2: number): void {
@@ -228,7 +235,7 @@ const app = (() => {
       }
     }
   }
-  function executeCalc(num1: number, num2: number, theMethod: string, func: Function) {
+  function executeCalc(num1: number, num2: number, theMethod: string, func: Function): void {
     const result = func(num1, num2);
     historyArr.push(new History(num1, theMethod, num2, result));
     bigScreenEl!.textContent = result.toString();
@@ -237,7 +244,7 @@ const app = (() => {
     showHistory();
     console.log(historyArr);
   }
-  function executeCalc2(num1: number, theMethod: string, func: Function) {
+  function executeCalc2(num1: number, theMethod: string, func: Function): void {
     const result = func(num1);
     historyArr.push(new History(num1, theMethod, 1, result));
     bigScreenEl!.textContent = result.toString();
@@ -252,7 +259,7 @@ const app = (() => {
     smallScreenEl!.textContent = smallScreenArr.join("");
   }
 
-  function showSmallScreenDel() {
+  function showSmallScreenDel(): void {
     smallScreenArr.pop();
     if (smallScreenArr.length === 0) {
       smallScreenEl!.textContent = "0";
@@ -260,19 +267,53 @@ const app = (() => {
     smallScreenEl!.textContent = smallScreenArr.join("");
   }
 
-  function showHistory() {
+  function showHistory(): void {
     historyWrapperEl!.textContent = "";
     let x = 1;
     const num = historyArr.length - 5;
     for (let i = historyArr.length; i >= num; i--) {
       console.log("showHistory");
       if (historyArr[i]) {
-        const mainSync = document.createElement("div");
-        mainSync.classList.add("history", `histNum${i}`);
-        mainSync.textContent = `${x++}.  ${historyArr[i].historyNum1} ${historyArr[i].methods} 
-        ${historyArr[i].historyNum2} = ${historyArr[i].result}`;
-        historyWrapperEl?.appendChild(mainSync);
+        if (historyArr[i].methods === "√") {
+          createHTML(1, historyArr[i], x++, i);
+        } else {
+          createHTML(2, historyArr[i], x++, i);
+        }
       }
     }
+  }
+
+  function createHTML(num: number, obj: History, x: number, i: number): void {
+    const mainSync = document.createElement("div");
+    mainSync.addEventListener("click", () => {
+      console.log(obj);
+      reUseCalc(obj, i);
+    });
+    const mainNumSpanEl = document.createElement("span");
+    const mainCalcEl = document.createElement("span");
+    mainNumSpanEl.classList.add("historySpan");
+    mainCalcEl.classList.add("historyCalc");
+    mainSync.classList.add("history", `histNum${i}`);
+    mainNumSpanEl.textContent = `${x++}.  `;
+    mainSync?.appendChild(mainNumSpanEl);
+    mainSync?.appendChild(mainCalcEl);
+    historyWrapperEl?.appendChild(mainSync);
+    switch (num) {
+      case 1: {
+        mainCalcEl.textContent = `${obj.methods}(${obj.historyNum1}) = ${obj.result}`;
+        break;
+      }
+      case 2: {
+        mainCalcEl.textContent = `${obj.historyNum1} ${obj.methods} 
+            ${obj.historyNum2} = ${obj.result}`;
+        break;
+      }
+    }
+  }
+
+  function reUseCalc(obj: History, i: number): void {
+    resetEverything();
+    historyArr.splice(i, 1);
+    calculation(obj.historyNum1, obj.methods, obj.historyNum2);
   }
 })();

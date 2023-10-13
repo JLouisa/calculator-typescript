@@ -36,9 +36,18 @@ main {
   padding: 2em;
 }
 
+.historySpan {
+  font-size: 1.2rem;
+}
+
+.historyCalc {
+  font-size: 1.5rem;
+}
+
 .history {
   padding: 2em;
   margin: 1em;
+  border: 1px solid black;
 }
 
 .wrapper {

@@ -41,7 +41,7 @@ const app = (() => {
     //! Caching DOM
     const buttonsEl = document.querySelector(".buttonsLayout");
     const screenEl = document.querySelector(".screen");
-    const historyLayoutEl = document.querySelector(".historyLayout");
+    //   const historyLayoutEl: HTMLElement | null = document.querySelector(".historyLayout");
     const historyWrapperEl = document.querySelector(".historyWrapper");
     //! Create calculator layout
     // Screen layout
@@ -140,11 +140,14 @@ const app = (() => {
     }
     // Equal
     arr[19].addEventListener("click", () => {
+        equalCalc();
+    });
+    function equalCalc() {
         equalState = true;
         calcArr.push(Number(inputArr.join("")));
         console.log(calcArr);
         calculation(calcArr[0], calcMethod[0], calcArr[2]);
-    });
+    }
     // Clear
     arr[0].addEventListener("click", () => {
         inputArr = [];
@@ -155,6 +158,15 @@ const app = (() => {
     });
     // Clear Everything
     arr[1].addEventListener("click", () => {
+        resetEverything();
+    });
+    // Delete
+    arr[2].addEventListener("click", () => {
+        inputArr.pop();
+        showSmallScreenDel();
+        console.log(inputArr);
+    });
+    function resetEverything() {
         inputArr = [];
         calcArr = [];
         smallScreenArr = [];
@@ -164,13 +176,7 @@ const app = (() => {
         bigScreenEl.textContent = "0";
         smallScreenEl.textContent = "0";
         console.log("Cleared Everything");
-    });
-    // Delete
-    arr[2].addEventListener("click", () => {
-        inputArr.pop();
-        showSmallScreenDel();
-        console.log(inputArr);
-    });
+    }
     //! Calculation Controller Module
     function calculation(num1, theMethod, num2) {
         switch (theMethod) {
@@ -236,12 +242,45 @@ const app = (() => {
         for (let i = historyArr.length; i >= num; i--) {
             console.log("showHistory");
             if (historyArr[i]) {
-                const mainSync = document.createElement("div");
-                mainSync.classList.add("history", `histNum${i}`);
-                mainSync.textContent = `${x++}.  ${historyArr[i].historyNum1} ${historyArr[i].methods} 
-        ${historyArr[i].historyNum2} = ${historyArr[i].result}`;
-                historyWrapperEl === null || historyWrapperEl === void 0 ? void 0 : historyWrapperEl.appendChild(mainSync);
+                if (historyArr[i].methods === "√") {
+                    createHTML(1, historyArr[i], x++, i);
+                }
+                else {
+                    createHTML(2, historyArr[i], x++, i);
+                }
             }
         }
+    }
+    function createHTML(num, obj, x, i) {
+        const mainSync = document.createElement("div");
+        mainSync.addEventListener("click", () => {
+            console.log(obj);
+            reUseCalc(obj, i);
+        });
+        const mainNumSpanEl = document.createElement("span");
+        const mainCalcEl = document.createElement("span");
+        mainNumSpanEl.classList.add("historySpan");
+        mainCalcEl.classList.add("historyCalc");
+        mainSync.classList.add("history", `histNum${i}`);
+        mainNumSpanEl.textContent = `${x++}.  `;
+        mainSync === null || mainSync === void 0 ? void 0 : mainSync.appendChild(mainNumSpanEl);
+        mainSync === null || mainSync === void 0 ? void 0 : mainSync.appendChild(mainCalcEl);
+        historyWrapperEl === null || historyWrapperEl === void 0 ? void 0 : historyWrapperEl.appendChild(mainSync);
+        switch (num) {
+            case 1: {
+                mainCalcEl.textContent = `${obj.methods}(${obj.historyNum1}) = ${obj.result}`;
+                break;
+            }
+            case 2: {
+                mainCalcEl.textContent = `${obj.historyNum1} ${obj.methods} 
+            ${obj.historyNum2} = ${obj.result}`;
+                break;
+            }
+        }
+    }
+    function reUseCalc(obj, i) {
+        resetEverything();
+        historyArr.splice(i, 1);
+        calculation(obj.historyNum1, obj.methods, obj.historyNum2);
     }
 })();
