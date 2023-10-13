@@ -27,7 +27,7 @@ const app = (() => {
       return Math.sqrt(num1 * num2);
     }
   }
-  const calculator = new Calc();
+  const calculator: Calc = new Calc();
 
   //! Create class history
   interface theHistory {
@@ -58,13 +58,15 @@ const app = (() => {
   let smallScreenArr: (number | string)[] = [];
 
   //! Falsy and Truthy
-  let equalState = false;
-  let numState = false;
+  let equalState: boolean = false;
+  let numState: boolean = false;
+
+  //! Route
+  let route: number = 0;
 
   //! Caching DOM
   const buttonsEl: HTMLElement | null = document.querySelector(".buttonsLayout");
   const screenEl: HTMLElement | null = document.querySelector(".screen");
-  //   const historyLayoutEl: HTMLElement | null = document.querySelector(".historyLayout");
   const historyWrapperEl: HTMLElement | null = document.querySelector(".historyWrapper");
 
   //! Create calculator layout
@@ -122,77 +124,116 @@ const app = (() => {
     ) {
       //! Add eventListener to numbers
       arr[i].addEventListener("click", () => {
-        numState = true;
-        if (equalState === false) {
-          showSmallScreen(contentArr[i]);
-          console.log(contentArr[i]);
-          inputArr.push(contentArr[i]);
+        if (route === 0 || route === 2) {
+          router(contentArr[i], contentArr[i]);
         }
-        if (equalState === true) {
-          inputArr = [];
-          smallScreenArr = [];
-          showSmallScreen(contentArr[i]);
-          console.log(contentArr[i]);
-          inputArr.push(contentArr[i]);
-          equalState = false;
+        if (route === 1) {
+          route = 2;
+          router(contentArr[i], contentArr[i]);
+        }
+        if (route === 3) {
+          route = 0;
+          resetSomethings();
+          router(contentArr[i], contentArr[i]);
+        }
+        if (route === 4) {
+          route = 2;
+          resetSomethings();
+          router(contentArr[i], contentArr[i]);
         }
       });
     }
     if (i === 3 || i === 7 || i === 11 || i === 15 || i === 18) {
       //! Add eventListener to methods
       arr[i].addEventListener("click", () => {
-        if (numState) {
-          if (inputArr.length === 0 && calcArr.length !== 0) {
-            calcArr.pop();
-            smallScreenArr.pop();
-            showSmallScreen(` ${contentArr[i]} `);
-            calcMethod = contentArr[i] as string;
-            calcArr.push(calcMethod);
-            console.log(contentArr[i]);
-            console.log(calcArr);
-          } else {
-            console.log(contentArr[i]);
-            showSmallScreen(` ${contentArr[i]} `);
-            calcArr.push(Number(inputArr.join("")));
-            calcArr.push(contentArr[i] as string);
-            inputArr = [];
-            console.log(calcArr);
-            calcMethod = contentArr[i] as string;
-            console.log(calcMethod);
-          }
+        if (route === 3) {
+          router(contentArr[i], contentArr[i]);
+        }
+        if (route === 1 || route === 4) {
+          calcMethod = contentArr[i] as string;
+        }
+        if (route === 0) {
+          route = 1;
+          router(contentArr[i], contentArr[i]);
         }
       });
     }
   }
 
+  //! Route module
+  function router(arg1: number | string, arg2: number | string) {
+    switch (route) {
+      case 0: {
+        showSmallScreen(arg1);
+        inputArr.push(arg2);
+        break;
+      }
+      case 1: {
+        showSmallScreen(` ${arg1} `);
+        calcArr.push(Number(inputArr.join("")));
+        inputArr = [];
+        calcMethod = arg1 as string;
+        break;
+      }
+      case 2: {
+        showSmallScreen(arg1);
+        inputArr.push(arg2);
+        break;
+      }
+      case 3: {
+        calcArr.push(Number(inputArr.join("")));
+        smallScreenArr = [];
+        smallScreenArr = [calcArr[0]];
+        showSmallScreen(calcArr[0]);
+        showSmallScreen(` ${arg1} `);
+        // inputArr.push(arg2);
+        route = 4;
+        break;
+      }
+      case 4: {
+        // calcArr.pop();
+        smallScreenArr.pop();
+        showSmallScreen(` ${arg1} `);
+        // calcMethod = arg1 as string;
+        // calcArr.push(calcMethod);
+        break;
+      }
+    }
+  }
+
   // Equal
   arr[19].addEventListener("click", () => {
-    equalCalc();
+    if (route === 2) {
+      equalCalc();
+      route = 3;
+    }
   });
   function equalCalc() {
-    equalState = true;
     calcArr.push(Number(inputArr.join("")));
-    console.log(calcArr);
-    calculation(calcArr[0] as number, calcMethod[0] as string, calcArr[2] as number);
+    calculation(calcArr[0] as number, calcMethod, calcArr[1] as number);
   }
   // Clear
   arr[0].addEventListener("click", () => {
-    inputArr = [];
-    smallScreenArr = [];
-    calcMethod = "";
-    bigScreenEl.textContent = "0";
-    console.log("cleared");
+    resetEverything();
   });
   // Clear Everything
   arr[1].addEventListener("click", () => {
     resetEverything();
+    historyArr = [];
+    showHistory();
   });
   // Delete
   arr[2].addEventListener("click", () => {
     inputArr.pop();
     showSmallScreenDel();
-    console.log(inputArr);
   });
+
+  function resetSomethings(): void {
+    inputArr = [];
+    calcArr = [];
+    smallScreenArr = [];
+    calcMethod = "";
+  }
 
   function resetEverything(): void {
     inputArr = [];
@@ -203,11 +244,16 @@ const app = (() => {
     numState = false;
     bigScreenEl!.textContent = "0";
     smallScreenEl!.textContent = "0";
-    console.log("Cleared Everything");
   }
 
   //! Calculation Controller Module
   function calculation(num1: number, theMethod: string, num2: number): void {
+    console.log("num1");
+    console.log(num1);
+    console.log("theMethod");
+    console.log(theMethod);
+    console.log("num2");
+    console.log(num2);
     switch (theMethod) {
       case "+": {
         executeCalc(num1, num2, theMethod, calculator.add);
@@ -229,10 +275,6 @@ const app = (() => {
         executeCalc2(num1, theMethod, calculator.root);
         break;
       }
-      default: {
-        console.log("nothing");
-        break;
-      }
     }
   }
   function executeCalc(num1: number, num2: number, theMethod: string, func: Function): void {
@@ -242,7 +284,7 @@ const app = (() => {
     calcArr = [];
     inputArr = result.toString().split(",");
     showHistory();
-    console.log(historyArr);
+    route = 2;
   }
   function executeCalc2(num1: number, theMethod: string, func: Function): void {
     const result = func(num1);
@@ -251,20 +293,19 @@ const app = (() => {
     calcArr = [];
     inputArr = result.toString().split(",");
     showHistory();
-    console.log(historyArr);
   }
 
+  //! Small Screen Display
   function showSmallScreen(element: number | string): void {
     smallScreenArr.push(element);
     smallScreenEl!.textContent = smallScreenArr.join("");
   }
-
   function showSmallScreenDel(): void {
     smallScreenArr.pop();
+    smallScreenEl!.textContent = smallScreenArr.join("");
     if (smallScreenArr.length === 0) {
       smallScreenEl!.textContent = "0";
     }
-    smallScreenEl!.textContent = smallScreenArr.join("");
   }
 
   function showHistory(): void {
@@ -272,7 +313,6 @@ const app = (() => {
     let x = 1;
     const num = historyArr.length - 5;
     for (let i = historyArr.length; i >= num; i--) {
-      console.log("showHistory");
       if (historyArr[i]) {
         if (historyArr[i].methods === "√") {
           createHTML(1, historyArr[i], x++, i);
@@ -286,7 +326,6 @@ const app = (() => {
   function createHTML(num: number, obj: History, x: number, i: number): void {
     const mainSync = document.createElement("div");
     mainSync.addEventListener("click", () => {
-      console.log(obj);
       reUseCalc(obj, i);
     });
     const mainNumSpanEl = document.createElement("span");
@@ -313,7 +352,9 @@ const app = (() => {
 
   function reUseCalc(obj: History, i: number): void {
     resetEverything();
+    equalState = true;
     historyArr.splice(i, 1);
     calculation(obj.historyNum1, obj.methods, obj.historyNum2);
+    showSmallScreen(`${obj.historyNum1} ${obj.methods} ${obj.historyNum2}`);
   }
 })();
