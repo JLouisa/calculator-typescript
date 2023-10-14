@@ -137,8 +137,7 @@ const app = (() => {
           router(contentArr[i], contentArr[i]);
         }
         if (route === 4) {
-          route = 2;
-          resetSomethings();
+          route = 6;
           router(contentArr[i], contentArr[i]);
         }
       });
@@ -150,10 +149,16 @@ const app = (() => {
           router(contentArr[i], contentArr[i]);
         }
         if (route === 1 || route === 4) {
+          smallScreenArr.pop();
           calcMethod = contentArr[i] as string;
+          showSmallScreen(` ${contentArr[i]} `);
         }
         if (route === 0) {
           route = 1;
+          router(contentArr[i], contentArr[i]);
+        }
+        if (route === 6) {
+          route = 4;
           router(contentArr[i], contentArr[i]);
         }
       });
@@ -181,21 +186,25 @@ const app = (() => {
         break;
       }
       case 3: {
+        calcMethod = arg1 as string;
         calcArr.push(Number(inputArr.join("")));
         smallScreenArr = [];
-        smallScreenArr = [calcArr[0]];
         showSmallScreen(calcArr[0]);
         showSmallScreen(` ${arg1} `);
-        // inputArr.push(arg2);
+        inputArr = [];
         route = 4;
         break;
       }
       case 4: {
-        // calcArr.pop();
         smallScreenArr.pop();
         showSmallScreen(` ${arg1} `);
-        // calcMethod = arg1 as string;
-        // calcArr.push(calcMethod);
+        break;
+      }
+      case 6: {
+        inputArr.push(arg2);
+        showSmallScreen(arg1);
+        equalCalc();
+        route = 3;
         break;
       }
     }
@@ -203,6 +212,9 @@ const app = (() => {
 
   // Equal
   arr[19].addEventListener("click", () => {
+    if (route === 3) {
+      equalCalc();
+    }
     if (route === 2) {
       equalCalc();
       route = 3;
@@ -282,6 +294,7 @@ const app = (() => {
     historyArr.push(new History(num1, theMethod, num2, result));
     bigScreenEl!.textContent = result.toString();
     calcArr = [];
+    inputArr = [];
     inputArr = result.toString().split(",");
     showHistory();
     route = 2;
